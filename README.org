@@ -22,7 +22,7 @@ You can learn more about the kernel module [[https://github.com/dakkshesh07/Kpro
 ** 1) Clone this repository to the specified directory
 
 #+BEGIN_SRC shell
-git clone https://github.com/yaap/packages_apps_KProfiles packages/apps/KProfiles 
+git clone https://github.com/KProfiles/android_packages_apps_KProfiles packages/apps/KProfiles
 #+END_SRC
 
 ** 2) Pick the following change in your device tree and build it as it is :)
