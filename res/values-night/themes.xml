@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 YAAP
+     Copyright (C) 2026 haloUI
+     Copyright (C) 2026 zenin1504
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <style name="Theme.Kprofiles" parent="android:Theme.DeviceDefault.DayNight">
+        <item name="android:windowBackground">@android:color/background_light</item>
+        <item name="android:colorBackground">@android:color/background_light</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowDisablePreview">false</item>
+    </style>
+</resources>

@@ -1,5 +1,7 @@
 //
-// Copyright (C) 2022 CannedShroud
+// Copyright (C) 2026 YAAP
+// Copyright (C) 2026 haloUI
+// Copyright (C) 2026 zenin1504
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -11,15 +13,30 @@ android_app {
         "SettingsLibDefaults",
     ],
 
-    srcs: ["src/**/*.java"],
+    srcs: ["src/**/*.kt"],
     resource_dirs: ["res"],
     certificate: "platform",
     platform_apis: true,
     system_ext_specific: true,
     privileged: true,
 
+    kotlincflags: [
+        "-Xjvm-default=all",
+        "-P plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true",
+    ],
+
     static_libs: [
         "androidx.core_core",
         "androidx.preference_preference",
+        "androidx.activity_activity-compose",
+        "androidx.lifecycle_lifecycle-runtime-compose",
+        "androidx.lifecycle_lifecycle-viewmodel-compose",
+        "androidx.compose.runtime_runtime",
+        "androidx.compose.ui_ui",
+        "androidx.compose.ui_ui-tooling-preview",
+        "androidx.compose.foundation_foundation",
+        "androidx.compose.material3_material3",
+        "androidx.compose.material_material-icons-extended",
+        "androidx.compose.material_material-ripple",
     ],
 }

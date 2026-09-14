@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2022 CannedShroud
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-          http://www.apache.org/licenses/LICENSE-2.0
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
+     Copyright (C) 2026 YAAP
+     Copyright (C) 2026 haloUI
+     Copyright (C) 2026 zenin1504
+
+     SPDX-License-Identifier: Apache-2.0
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources>
+    <string name="app_name">KProfiles</string>
 
     <string name="kprofiles_title">KProfiles</string>
-    <string name="kprofiles_summary">Managing Kernelspace profiles to achieve balancing in terms of battery backup and performance</string>
-    <string name="kprofiles_auto_title">Use Auto KProfiles</string>
-    <string name="kprofiles_auto_summary">Automatically switch to battery mode when device screen turns off and back to default profile when screen turns on</string>
-    <string name="kprofiles_modes_title">KProfiles Modes</string>
+    <string name="kprofiles_auto_title">Automatic mode</string>
+    <string name="kprofiles_auto_summary">Let KProfiles switch modes automatically</string>
+
+    <string name="kprofiles_modes_title">Mode</string>
+    <string name="kprofiles_modes_description_title">Description</string>
+    <string name="kprofiles_modes_description">%1$s</string>
+
     <string name="kprofiles_modes_none">None</string>
     <string name="kprofiles_modes_battery">Battery</string>
     <string name="kprofiles_modes_balanced">Balanced</string>
     <string name="kprofiles_modes_performance">Performance</string>
-    <string name="kprofiles_not_supported">KProfiles is not currently supported by the kernel</string>
-    <string name="kprofiles_modes_description" translatable="false"><xliff:g id="description">%s</xliff:g></string>
-    <string name="kprofiles_modes_none_description">Regulate and manage in-kernel activities in a profile-oriented manner to achieve balance in terms of battery backup and performance accordingly</string>
-    <string name="kprofiles_modes_battery_description">Battery Mode:\nSkip all userspace and/or in-kernel boosts, reduces gpu scaling frequency</string>
-    <string name="kprofiles_modes_balanced_description">Balanced Mode:\nTips the balance between battery and performance modes</string>
-    <string name="kprofiles_modes_performance_description">Performance Mode:\nMaximize all boosts, increases gpu scaling frequency to its max</string>
 
+    <string name="kprofiles_modes_none_description">KProfiles is disabled. The kernel decides the default behavior.</string>
+    <string name="kprofiles_modes_battery_description">Prioritizes power efficiency at the expense of performance.</string>
+    <string name="kprofiles_modes_balanced_description">Balances performance and power consumption.</string>
+    <string name="kprofiles_modes_performance_description">Prioritizes performance at the expense of power efficiency.</string>
+
+    <string name="kprofiles_not_supported">Not supported on this device</string>
+
+    <string name="kprofiles_customize_title">Customize</string>
+    <string name="kprofiles_customize_open">Customize appearance</string>
+    <string name="kprofiles_theme_title">Theme</string>
+    <string name="kprofiles_theme_system">System</string>
+    <string name="kprofiles_theme_light">Light</string>
+    <string name="kprofiles_theme_dark">Dark</string>
+    <string name="kprofiles_dynamic_color_title">Dynamic color</string>
+    <string name="kprofiles_dynamic_color_summary">Use wallpaper-based colors</string>
+    <string name="kprofiles_dynamic_color_unsupported">Requires Android 12 or newer</string>
+    <string name="kprofiles_accent_title">Accent</string>
+    <string name="kprofiles_accent_summary">Overrides the primary color when dynamic color is off</string>
+    <string name="kprofiles_summary">Manage performance and battery profiles</string>
 </resources>
