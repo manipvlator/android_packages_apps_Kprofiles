@@ -23,6 +23,8 @@ android_app {
     kotlincflags: [
         "-Xjvm-default=all",
         "-P plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true",
+        "-P plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=out/compose-metrics",
+        "-P plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=out/compose-reports",
     ],
 
     static_libs: [

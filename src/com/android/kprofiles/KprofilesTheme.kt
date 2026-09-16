@@ -17,6 +17,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
@@ -32,7 +33,7 @@ fun rememberKprofilesColorScheme(
     dark: Boolean,
     dynamicColor: Boolean,
     accentIndex: Int,
-) = run {
+) = remember(dark, dynamicColor, accentIndex) {
     val ctx = LocalContext.current
     val supportsDynamic = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 

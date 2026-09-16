@@ -16,6 +16,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import android.util.Log
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.android.kprofiles.Kprofiles
@@ -23,7 +24,19 @@ import com.android.kprofiles.utils.FileUtils
 
 class KprofilesModesTileService : TileService() {
 
+    private companion object {
+        const val TAG = "KProfiles:Tile"
+    }
+
+    @Volatile
     private var selfChange = false
+
+    @Volatile
+    private var receiverRegistered = false
+
+    private val changeIntent: Intent = Intent(Kprofiles.INTENT_ACTION).apply {
+        setFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY)
+    }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -38,68 +51,112 @@ class KprofilesModesTileService : TileService() {
 
     override fun onCreate() {
         super.onCreate()
-        if (!Kprofiles.IS_SUPPORTED) {
-            qsTile?.apply {
-                state = Tile.STATE_UNAVAILABLE
-                updateTile()
+        try {
+            if (!Kprofiles.IS_SUPPORTED) {
+                qsTile?.apply {
+                    state = Tile.STATE_UNAVAILABLE
+                    updateTile()
+                }
             }
+        } catch (t: Throwable) {
+            Log.w(TAG, "onCreate failed", t)
         }
     }
 
     override fun onStartListening() {
-        if (!Kprofiles.IS_SUPPORTED) return
-        super.onStartListening()
+        try {
+            if (!Kprofiles.IS_SUPPORTED) return
+            super.onStartListening()
 
-        val filter = IntentFilter(Kprofiles.INTENT_ACTION)
-        val flags =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                Context.RECEIVER_EXPORTED
-            else 0
-        registerReceiver(receiver, filter, flags)
-
-        updateTile()
+            if (!receiverRegistered) {
+                val filter = IntentFilter(Kprofiles.INTENT_ACTION)
+                val flags =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                        Context.RECEIVER_EXPORTED
+                    else 0
+                registerReceiver(receiver, filter, flags)
+                receiverRegistered = true
+            }
+            updateTile()
+        } catch (t: Throwable) {
+            Log.w(TAG, "onStartListening failed", t)
+        }
     }
 
     override fun onStopListening() {
-        if (Kprofiles.IS_SUPPORTED) {
-            runCatching { unregisterReceiver(receiver) }
+        try {
+            if (receiverRegistered) {
+                runCatching { unregisterReceiver(receiver) }
+                receiverRegistered = false
+            }
+        } catch (t: Throwable) {
+            Log.w(TAG, "onStopListening failed", t)
         }
         super.onStopListening()
     }
 
     override fun onClick() {
-        if (!Kprofiles.IS_SUPPORTED) return
+        try {
+            if (!Kprofiles.IS_SUPPORTED) return
 
-        val next = Kprofiles.Mode.next(currentMode())
-        FileUtils.writeLine(Kprofiles.MODES_NODE, next.value)
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .edit { putString(Kprofiles.MODES_KEY, next.value) }
+            val next = Kprofiles.Mode.next(currentMode())
+            val value = Kprofiles.sanitizeModeValue(next.value)
 
-        selfChange = true
-        sendBroadcast(
-            Intent(Kprofiles.INTENT_ACTION).apply {
-                setFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY)
-            },
-        )
+            val ok = FileUtils.writeLine(Kprofiles.MODES_NODE, value)
+            if (!ok) {
+                Log.w(TAG, "onClick: write failed for $value")
+                return
+            }
 
-        updateTile(next.value)
-        super.onClick()
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .edit { putString(Kprofiles.MODES_KEY, value) }
+
+            selfChange = true
+            sendBroadcast(changeIntent)
+
+            updateTile(value)
+        } catch (t: Throwable) {
+            Log.e(TAG, "onClick failed", t)
+        } finally {
+            runCatching { super.onClick() }
+        }
     }
 
-    private fun currentMode(): Kprofiles.Mode =
-        Kprofiles.Mode.from(FileUtils.readOneLine(Kprofiles.MODES_NODE))
+    private fun currentMode(): Kprofiles.Mode {
+        return try {
+            Kprofiles.Mode.from(FileUtils.readOneLine(Kprofiles.MODES_NODE))
+        } catch (t: Throwable) {
+            Log.w(TAG, "currentMode failed", t)
+            Kprofiles.Mode.NONE
+        }
+    }
 
     private fun updateTile(modeValue: String? = null) {
-        if (!Kprofiles.IS_SUPPORTED) return
-        val tile = qsTile ?: return
-        val mode = modeValue?.let { Kprofiles.Mode.from(it) } ?: currentMode()
+        try {
+            if (!Kprofiles.IS_SUPPORTED) return
+            val tile = qsTile ?: return
+            val mode = if (modeValue != null) {
+                Kprofiles.Mode.from(modeValue)
+            } else {
+                currentMode()
+            }
 
-        tile.state =
-            if (mode != Kprofiles.Mode.NONE) Tile.STATE_ACTIVE
-            else Tile.STATE_INACTIVE
-        tile.subtitle = getString(mode.labelRes)
-        tile.contentDescription = getString(mode.labelRes)
-        tile.icon = Icon.createWithResource(this, mode.iconRes)
-        tile.updateTile()
+            tile.state =
+                if (mode != Kprofiles.Mode.NONE) Tile.STATE_ACTIVE
+                else Tile.STATE_INACTIVE
+
+            val label = try {
+                getString(mode.labelRes)
+            } catch (t: Throwable) {
+                mode.name
+            }
+
+            tile.subtitle = label
+            tile.contentDescription = label
+            tile.icon = Icon.createWithResource(this, mode.iconRes)
+            tile.updateTile()
+        } catch (t: Throwable) {
+            Log.w(TAG, "updateTile failed", t)
+        }
     }
 }

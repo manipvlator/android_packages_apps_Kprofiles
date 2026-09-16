@@ -13,7 +13,9 @@ import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.compose.runtime.Immutable
 
+@Immutable
 data class UiPrefs(
     val themeMode: Int = KprofilesPrefs.THEME_SYSTEM,
     val dynamicColor: Boolean = true,

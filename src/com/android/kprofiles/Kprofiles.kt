@@ -56,11 +56,26 @@ object Kprofiles {
         );
 
         companion object {
-            fun from(value: String?): Mode =
-                entries.firstOrNull { it.value == value?.trim() } ?: NONE
+            fun from(value: String?): Mode {
+                val v = value?.trim().orEmpty()
+                if (v.isEmpty()) return NONE
+                return entries.firstOrNull { it.value == v } ?: NONE
+            }
 
-            fun next(mode: Mode): Mode =
-                entries[(mode.ordinal + 1) % entries.size]
+            fun next(mode: Mode?): Mode {
+                val m = mode ?: NONE
+                return entries[(m.ordinal + 1) % entries.size]
+            }
         }
     }
+
+    fun sanitizeModeValue(raw: String?): String {
+        val v = raw?.trim().orEmpty()
+        return if (entriesContains(v)) v else NONE_VALUE
+    }
+
+    private fun entriesContains(v: String): Boolean =
+        Mode.entries.any { it.value == v }
+
+    private const val NONE_VALUE = "0"
 }

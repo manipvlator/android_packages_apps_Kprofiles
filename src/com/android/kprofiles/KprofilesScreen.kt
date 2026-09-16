@@ -33,9 +33,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -53,12 +53,10 @@ fun KprofilesScreen(
     onOpenCustomize: () -> Unit,
     vm: KprofilesViewModel = viewModel(),
 ) {
-    val mode by vm.mode.collectAsStateWithLifecycle()
-    val autoEnabled by vm.autoEnabled.collectAsStateWithLifecycle()
-    val supported = Kprofiles.IS_SUPPORTED
+    val mode by vm.mode.collectAsState()
+    val autoEnabled by vm.autoEnabled.collectAsState()
+    val supported = remember { Kprofiles.IS_SUPPORTED }
     val autoSupported = remember { FileUtils.fileExists(Kprofiles.AUTO_NODE) }
-
-    LaunchedEffect(Unit) { vm.refresh() }
 
     Scaffold(
         topBar = {
