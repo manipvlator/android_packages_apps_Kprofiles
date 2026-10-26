@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2026 YAAP
  * Copyright (C) 2026 haloUI
+ * Copyright (C) 2026 TheParasiteProject
  * Copyright (C) 2026 zenin1504
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -35,7 +36,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -53,10 +53,14 @@ fun KprofilesScreen(
     onOpenCustomize: () -> Unit,
     vm: KprofilesViewModel = viewModel(),
 ) {
-    val mode by vm.mode.collectAsState()
-    val autoEnabled by vm.autoEnabled.collectAsState()
+    val mode by vm.mode.collectAsStateWithLifecycle()
+    val autoEnabled by vm.autoEnabled.collectAsStateWithLifecycle()
+    val enabled by vm.enabled.collectAsStateWithLifecycle()
+    val powerSave by vm.powerSave.collectAsStateWithLifecycle()
     val supported = remember { Kprofiles.IS_SUPPORTED }
-    val autoSupported = remember { FileUtils.fileExists(Kprofiles.AUTO_NODE) }
+    val autoSupported = remember {
+        Kprofiles.IS_SUPPORTED && FileUtils.fileExists(Kprofiles.AUTO_NODE)
+    }
 
     Scaffold(
         topBar = {
@@ -100,21 +104,67 @@ fun KprofilesScreen(
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.kprofiles_auto_title),
+                            text = stringResource(R.string.kprofiles_enabled_title),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
-                            text = if (autoSupported)
-                                stringResource(R.string.kprofiles_auto_summary)
-                            else
-                                stringResource(R.string.kprofiles_not_supported),
+                            text = when {
+                                !supported -> stringResource(R.string.kprofiles_not_supported)
+                                enabled -> stringResource(R.string.kprofiles_enabled_summary)
+                                else -> stringResource(R.string.kprofiles_disabled_summary)
+                            },
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
                     Switch(
-                        checked = autoEnabled,
+                        checked = supported && enabled,
+                        onCheckedChange = { vm.setEnabled(it) },
+                        enabled = supported,
+                    )
+                }
+            }
+
+            if (supported && enabled && powerSave) {
+                ElevatedCard {
+                    Column(Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.kprofiles_battery_saver_title),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            text = stringResource(R.string.kprofiles_battery_saver_summary),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            }
+
+            ElevatedCard {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.kprofiles_auto_title),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            text = when {
+                                !autoSupported -> stringResource(R.string.kprofiles_not_supported)
+                                !enabled -> stringResource(R.string.kprofiles_enable_first)
+                                powerSave -> stringResource(R.string.kprofiles_battery_saver_on)
+                                else -> stringResource(R.string.kprofiles_auto_summary)
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    Switch(
+                        checked = autoSupported && autoEnabled,
                         onCheckedChange = { vm.setAuto(it) },
-                        enabled = autoSupported,
+                        enabled = autoSupported && enabled && !powerSave,
                     )
                 }
             }
@@ -125,6 +175,24 @@ fun KprofilesScreen(
                         text = stringResource(R.string.kprofiles_modes_title),
                         style = MaterialTheme.typography.titleMedium,
                     )
+                    if (supported) {
+                        if (!enabled) {
+                            Text(
+                                text = stringResource(R.string.kprofiles_enable_first),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        } else if (powerSave) {
+                            Text(
+                                text = stringResource(R.string.kprofiles_battery_saver_on),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = stringResource(R.string.kprofiles_not_supported),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                     Spacer(Modifier.height(12.dp))
 
                     Kprofiles.Mode.entries.forEach { m ->
@@ -137,7 +205,7 @@ fun KprofilesScreen(
                             RadioButton(
                                 selected = mode == m,
                                 onClick = { vm.setMode(m) },
-                                enabled = supported,
+                                enabled = supported && enabled && !powerSave,
                             )
                             Icon(
                                 painter = painterResource(m.iconRes),
@@ -168,10 +236,12 @@ fun KprofilesScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = if (supported)
-                            stringResource(mode.descRes)
-                        else
-                            stringResource(R.string.kprofiles_not_supported),
+                        text = when {
+                            !supported -> stringResource(R.string.kprofiles_not_supported)
+                            !enabled -> stringResource(R.string.kprofiles_enable_first)
+                            powerSave -> stringResource(R.string.kprofiles_battery_saver_summary)
+                            else -> stringResource(mode.descRes)
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Start,
                     )

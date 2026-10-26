@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2026 YAAP
  * Copyright (C) 2026 haloUI
+ * Copyright (C) 2026 TheParasiteProject
  * Copyright (C) 2026 zenin1504
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -14,12 +15,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.os.PowerManager
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.util.Log
-import androidx.core.content.edit
-import androidx.preference.PreferenceManager
+import androidx.core.content.ContextCompat
 import com.android.kprofiles.Kprofiles
+import com.android.kprofiles.KprofilesState
 import com.android.kprofiles.utils.FileUtils
 
 class KprofilesModesTileService : TileService() {
@@ -28,8 +30,7 @@ class KprofilesModesTileService : TileService() {
         const val TAG = "KProfiles:Tile"
     }
 
-    @Volatile
-    private var selfChange = false
+    private lateinit var powerManager: PowerManager
 
     @Volatile
     private var receiverRegistered = false
@@ -41,80 +42,76 @@ class KprofilesModesTileService : TileService() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action != Kprofiles.INTENT_ACTION) return
-            if (selfChange) {
-                selfChange = false
-                return
-            }
             updateTile()
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-        try {
-            if (!Kprofiles.IS_SUPPORTED) {
-                qsTile?.apply {
-                    state = Tile.STATE_UNAVAILABLE
-                    updateTile()
-                }
+        powerManager = getSystemService(PowerManager::class.java)
+
+        if (!Kprofiles.IS_SUPPORTED) {
+            qsTile?.apply {
+                state = Tile.STATE_UNAVAILABLE
+                updateTile()
             }
-        } catch (t: Throwable) {
-            Log.w(TAG, "onCreate failed", t)
         }
     }
 
     override fun onStartListening() {
-        try {
-            if (!Kprofiles.IS_SUPPORTED) return
-            super.onStartListening()
+        super.onStartListening()
+        if (!Kprofiles.IS_SUPPORTED) return
 
-            if (!receiverRegistered) {
+        if (!receiverRegistered) {
+            try {
                 val filter = IntentFilter(Kprofiles.INTENT_ACTION)
                 val flags =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                         Context.RECEIVER_EXPORTED
                     else 0
-                registerReceiver(receiver, filter, flags)
+                ContextCompat.registerReceiver(this, receiver, filter, flags)
                 receiverRegistered = true
+            } catch (t: Throwable) {
+                Log.w(TAG, "receiver registration failed", t)
             }
-            updateTile()
-        } catch (t: Throwable) {
-            Log.w(TAG, "onStartListening failed", t)
         }
+        updateTile()
     }
 
     override fun onStopListening() {
-        try {
-            if (receiverRegistered) {
-                runCatching { unregisterReceiver(receiver) }
-                receiverRegistered = false
-            }
-        } catch (t: Throwable) {
-            Log.w(TAG, "onStopListening failed", t)
+        if (receiverRegistered) {
+            runCatching { unregisterReceiver(receiver) }
+            receiverRegistered = false
         }
         super.onStopListening()
+    }
+
+    override fun onDestroy() {
+        if (receiverRegistered) {
+            runCatching { unregisterReceiver(receiver) }
+            receiverRegistered = false
+        }
+        super.onDestroy()
     }
 
     override fun onClick() {
         try {
             if (!Kprofiles.IS_SUPPORTED) return
-
-            val next = Kprofiles.Mode.next(currentMode())
-            val value = Kprofiles.sanitizeModeValue(next.value)
-
-            val ok = FileUtils.writeLine(Kprofiles.MODES_NODE, value)
-            if (!ok) {
-                Log.w(TAG, "onClick: write failed for $value")
+            if (!KprofilesState.isEnabled(this) || powerManager.isPowerSaveMode) {
+                updateTile()
                 return
             }
 
-            PreferenceManager.getDefaultSharedPreferences(this)
-                .edit { putString(Kprofiles.MODES_KEY, value) }
+            val next = Kprofiles.Mode.next(Kprofiles.Mode.from(KprofilesState.getMode(this)))
+            val ok = FileUtils.writeLine(Kprofiles.MODES_NODE, next.value)
+            if (!ok) {
+                Log.w(TAG, "onClick: write failed for ${next.value}")
+                return
+            }
 
-            selfChange = true
+            KprofilesState.setMode(this, next.value)
             sendBroadcast(changeIntent)
-
-            updateTile(value)
+            updateTile(next)
         } catch (t: Throwable) {
             Log.e(TAG, "onClick failed", t)
         } finally {
@@ -122,38 +119,42 @@ class KprofilesModesTileService : TileService() {
         }
     }
 
-    private fun currentMode(): Kprofiles.Mode {
-        return try {
-            Kprofiles.Mode.from(FileUtils.readOneLine(Kprofiles.MODES_NODE))
-        } catch (t: Throwable) {
-            Log.w(TAG, "currentMode failed", t)
-            Kprofiles.Mode.NONE
-        }
-    }
-
-    private fun updateTile(modeValue: String? = null) {
+    private fun updateTile(mode: Kprofiles.Mode? = null) {
         try {
-            if (!Kprofiles.IS_SUPPORTED) return
             val tile = qsTile ?: return
-            val mode = if (modeValue != null) {
-                Kprofiles.Mode.from(modeValue)
-            } else {
-                currentMode()
+            if (!Kprofiles.IS_SUPPORTED) {
+                tile.state = Tile.STATE_UNAVAILABLE
+                tile.updateTile()
+                return
             }
 
+            if (!KprofilesState.isEnabled(this) || powerManager.isPowerSaveMode) {
+                tile.state = Tile.STATE_UNAVAILABLE
+                tile.subtitle =
+                    if (powerManager.isPowerSaveMode) {
+                        getString(R.string.kprofiles_battery_saver_on)
+                    } else {
+                        null
+                    }
+                tile.contentDescription = getString(R.string.kprofiles_title)
+                tile.updateTile()
+                return
+            }
+
+            val current = mode ?: Kprofiles.Mode.from(KprofilesState.getMode(this))
             tile.state =
-                if (mode != Kprofiles.Mode.NONE) Tile.STATE_ACTIVE
+                if (current != Kprofiles.Mode.NONE) Tile.STATE_ACTIVE
                 else Tile.STATE_INACTIVE
 
             val label = try {
-                getString(mode.labelRes)
+                getString(current.labelRes)
             } catch (t: Throwable) {
-                mode.name
+                current.name
             }
 
             tile.subtitle = label
             tile.contentDescription = label
-            tile.icon = Icon.createWithResource(this, mode.iconRes)
+            tile.icon = Icon.createWithResource(this, current.iconRes)
             tile.updateTile()
         } catch (t: Throwable) {
             Log.w(TAG, "updateTile failed", t)

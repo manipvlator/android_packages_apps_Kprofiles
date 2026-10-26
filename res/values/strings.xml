@@ -2,6 +2,7 @@
 <!--
      Copyright (C) 2026 YAAP
      Copyright (C) 2026 haloUI
+     Copyright (C) 2026 TheParasiteProject
      Copyright (C) 2026 zenin1504
 
      SPDX-License-Identifier: Apache-2.0
@@ -10,8 +11,17 @@
     <string name="app_name">KProfiles</string>
 
     <string name="kprofiles_title">KProfiles</string>
-    <string name="kprofiles_auto_title">Automatic mode</string>
-    <string name="kprofiles_auto_summary">Let KProfiles switch modes automatically</string>
+    <string name="kprofiles_enabled_title">Use KProfiles</string>
+    <string name="kprofiles_enabled_summary">KProfiles is enabled</string>
+    <string name="kprofiles_disabled_summary">KProfiles is disabled</string>
+    <string name="kprofiles_enable_first">Enable KProfiles to change this setting</string>
+
+    <string name="kprofiles_battery_saver_title">Battery Saver</string>
+    <string name="kprofiles_battery_saver_summary">Battery Saver is on. KProfiles is temporarily using Battery mode and automatic switching is disabled.</string>
+    <string name="kprofiles_battery_saver_on">Temporarily disabled due to Battery Saver</string>
+
+    <string name="kprofiles_auto_title">Auto KProfiles</string>
+    <string name="kprofiles_auto_summary">Switch to Battery mode when the screen turns off and restore the selected mode when it turns on</string>
 
     <string name="kprofiles_modes_title">Mode</string>
     <string name="kprofiles_modes_description_title">Description</string>
@@ -41,4 +51,5 @@
     <string name="kprofiles_accent_title">Accent</string>
     <string name="kprofiles_accent_summary">Overrides the primary color when dynamic color is off</string>
     <string name="kprofiles_summary">Manage performance and battery profiles</string>
+    <string name="kprofiles_search_keywords">KProfiles, Auto KProfiles, KProfiles Modes, kernel, battery, profiles, performance</string>
 </resources>

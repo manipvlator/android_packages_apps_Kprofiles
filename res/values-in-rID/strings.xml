@@ -2,6 +2,7 @@
 <!--
      Copyright (C) 2026 YAAP
      Copyright (C) 2026 haloUI
+     Copyright (C) 2026 TheParasiteProject
      Copyright (C) 2026 zenin1504
 
      SPDX-License-Identifier: Apache-2.0
@@ -10,8 +11,17 @@
     <string name="app_name">KProfiles</string>
 
     <string name="kprofiles_title">KProfiles</string>
-    <string name="kprofiles_auto_title">Mode otomatis</string>
-    <string name="kprofiles_auto_summary">Biarkan KProfiles mengganti mode secara otomatis</string>
+    <string name="kprofiles_enabled_title">Gunakan KProfiles</string>
+    <string name="kprofiles_enabled_summary">KProfiles aktif</string>
+    <string name="kprofiles_disabled_summary">KProfiles dinonaktifkan</string>
+    <string name="kprofiles_enable_first">Aktifkan KProfiles untuk mengubah pengaturan ini</string>
+
+    <string name="kprofiles_battery_saver_title">Penghemat baterai</string>
+    <string name="kprofiles_battery_saver_summary">Penghemat baterai aktif. KProfiles sementara memakai mode Hemat baterai dan pergantian otomatis dinonaktifkan.</string>
+    <string name="kprofiles_battery_saver_on">Sementara dinonaktifkan karena Penghemat baterai</string>
+
+    <string name="kprofiles_auto_title">KProfiles otomatis</string>
+    <string name="kprofiles_auto_summary">Beralih ke mode Hemat baterai saat layar mati dan kembali ke mode pilihan saat layar menyala</string>
 
     <string name="kprofiles_modes_title">Mode</string>
     <string name="kprofiles_modes_description_title">Deskripsi</string>
@@ -41,4 +51,5 @@
     <string name="kprofiles_accent_title">Warna aksen</string>
     <string name="kprofiles_accent_summary">Menimpa warna utama saat warna dinamis nonaktif</string>
     <string name="kprofiles_summary">Atur profil performa dan baterai</string>
+    <string name="kprofiles_search_keywords">KProfiles, KProfiles otomatis, Mode KProfiles, kernel, baterai, profil, performa</string>
 </resources>

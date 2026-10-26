@@ -16,9 +16,6 @@ object Kprofiles {
     const val MODES_NODE = "/sys/kernel/kprofiles/kp_mode"
     const val AUTO_NODE = "/sys/module/kprofiles/parameters/auto_kp"
 
-    const val AUTO_KEY = "kprofiles_auto"
-    const val MODES_KEY = "kprofiles_modes"
-
     const val ON = "Y"
     const val OFF = "N"
 
