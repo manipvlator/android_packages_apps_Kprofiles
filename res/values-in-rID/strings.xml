@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 YAAP
+     Copyright (C) 2026 haloUI
+     Copyright (C) 2026 zenin1504
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string name="app_name">KProfiles</string>
+
+    <string name="kprofiles_title">KProfiles</string>
+    <string name="kprofiles_auto_title">Mode otomatis</string>
+    <string name="kprofiles_auto_summary">Biarkan KProfiles mengganti mode secara otomatis</string>
+
+    <string name="kprofiles_modes_title">Mode</string>
+    <string name="kprofiles_modes_description_title">Deskripsi</string>
+    <string name="kprofiles_modes_description">%1$s</string>
+
+    <string name="kprofiles_modes_none">Nonaktif</string>
+    <string name="kprofiles_modes_battery">Hemat baterai</string>
+    <string name="kprofiles_modes_balanced">Seimbang</string>
+    <string name="kprofiles_modes_performance">Performa</string>
+
+    <string name="kprofiles_modes_none_description">KProfiles nonaktif. Kernel menentukan perilaku default.</string>
+    <string name="kprofiles_modes_battery_description">Mengutamakan efisiensi daya dengan mengorbankan performa.</string>
+    <string name="kprofiles_modes_balanced_description">Menyeimbangkan performa dan konsumsi daya.</string>
+    <string name="kprofiles_modes_performance_description">Mengutamakan performa dengan mengorbankan efisiensi daya.</string>
+
+    <string name="kprofiles_not_supported">Tidak didukung di perangkat ini</string>
+
+    <string name="kprofiles_customize_title">Sesuaikan</string>
+    <string name="kprofiles_customize_open">Sesuaikan tampilan</string>
+    <string name="kprofiles_theme_title">Tema</string>
+    <string name="kprofiles_theme_system">Sistem</string>
+    <string name="kprofiles_theme_light">Terang</string>
+    <string name="kprofiles_theme_dark">Gelap</string>
+    <string name="kprofiles_dynamic_color_title">Warna dinamis</string>
+    <string name="kprofiles_dynamic_color_summary">Gunakan warna dari wallpaper</string>
+    <string name="kprofiles_dynamic_color_unsupported">Memerlukan Android 12 atau lebih baru</string>
+    <string name="kprofiles_accent_title">Warna aksen</string>
+    <string name="kprofiles_accent_summary">Menimpa warna utama saat warna dinamis nonaktif</string>
+    <string name="kprofiles_summary">Atur profil performa dan baterai</string>
+</resources>
