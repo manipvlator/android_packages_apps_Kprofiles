@@ -9,7 +9,6 @@
 package com.android.kprofiles
 
 import android.content.Context
-import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 
 object KprofilesPrefs {
@@ -34,19 +33,19 @@ object KprofilesPrefs {
         prefs(ctx).getInt(KEY_THEME, THEME_SYSTEM)
 
     fun setThemeMode(ctx: Context, value: Int) =
-        prefs(ctx).edit { putInt(KEY_THEME, value) }
+        prefs(ctx).edit().putInt(KEY_THEME, value).apply()
 
     fun dynamicColor(ctx: Context): Boolean =
         prefs(ctx).getBoolean(KEY_DYNAMIC_COLOR, true)
 
     fun setDynamicColor(ctx: Context, value: Boolean) =
-        prefs(ctx).edit { putBoolean(KEY_DYNAMIC_COLOR, value) }
+        prefs(ctx).edit().putBoolean(KEY_DYNAMIC_COLOR, value).apply()
 
     fun accentIndex(ctx: Context): Int =
         prefs(ctx).getInt(KEY_ACCENT, 0)
 
     fun setAccentIndex(ctx: Context, value: Int) =
-        prefs(ctx).edit { putInt(KEY_ACCENT, value) }
+        prefs(ctx).edit().putInt(KEY_ACCENT, value).apply()
 
     private fun prefs(ctx: Context) =
         PreferenceManager.getDefaultSharedPreferences(ctx)

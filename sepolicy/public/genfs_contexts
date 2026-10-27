@@ -1,2 +1,4 @@
 genfscon sysfs /module/kprofiles/parameters/auto_kp                                                                                     u:object_r:sysfs_kprofiles:s0
 genfscon sysfs /kernel/kprofiles/kp_mode                                                                                            u:object_r:sysfs_kprofiles:s0
+genfscon sysfs /kernel/kprofiles/kp_active                                                                                          u:object_r:sysfs_kprofiles:s0
+genfscon sysfs /kernel/kprofiles/kp_screen                                                                                          u:object_r:sysfs_kprofiles:s0

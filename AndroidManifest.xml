@@ -23,7 +23,7 @@
         android:persistent="true"
         android:enableOnBackInvokedCallback="true"
         android:defaultToDeviceProtectedStorage="true"
-        android:theme="@style/Theme.SubSettingsBase.Expressive">
+        android:theme="@style/Theme.Kprofiles">
 
         <receiver
             android:name=".BootCompletedReceiver"

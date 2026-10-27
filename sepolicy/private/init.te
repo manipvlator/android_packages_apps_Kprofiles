@@ -1,1 +1,1 @@
-allow init sysfs_kprofiles:file { open read setattr };
+allow init sysfs_kprofiles:file { open read getattr setattr };

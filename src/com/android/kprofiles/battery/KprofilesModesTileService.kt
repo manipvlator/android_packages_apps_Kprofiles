@@ -102,7 +102,7 @@ class KprofilesModesTileService : TileService() {
                 return
             }
 
-            val next = Kprofiles.Mode.next(Kprofiles.Mode.from(KprofilesState.getMode(this)))
+            val next = Kprofiles.Mode.next(currentNodeMode())
             val ok = FileUtils.writeLine(Kprofiles.MODES_NODE, next.value)
             if (!ok) {
                 Log.w(TAG, "onClick: write failed for ${next.value}")
@@ -118,6 +118,13 @@ class KprofilesModesTileService : TileService() {
             runCatching { super.onClick() }
         }
     }
+
+    /** Read the mode the kernel currently has, falling back to the saved value. */
+    private fun currentNodeMode(): Kprofiles.Mode =
+        Kprofiles.Mode.from(
+            FileUtils.readOneLine(Kprofiles.MODES_NODE)
+                ?: KprofilesState.getMode(this)
+        )
 
     private fun updateTile(mode: Kprofiles.Mode? = null) {
         try {
@@ -141,7 +148,7 @@ class KprofilesModesTileService : TileService() {
                 return
             }
 
-            val current = mode ?: Kprofiles.Mode.from(KprofilesState.getMode(this))
+            val current = mode ?: currentNodeMode()
             tile.state =
                 if (current != Kprofiles.Mode.NONE) Tile.STATE_ACTIVE
                 else Tile.STATE_INACTIVE

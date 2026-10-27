@@ -117,6 +117,21 @@ echo Y > /sys/module/kprofiles/parameters/auto_kp
 The master switch, Battery Saver override, and Quick Settings tile are
 frontend features and are not available through the sysfs nodes alone.
 
+## Diagnostics
+
+The kernel also exposes two read-only nodes:
+
+```text
+/sys/kernel/kprofiles/kp_active   # effective mode used by the kernel hooks
+/sys/kernel/kprofiles/kp_screen   # 1 while the screen is on, 0 while it is off
+```
+
+`kp_mode` always reports the mode selected by userspace. `kp_active` reports
+the mode the in-kernel hooks are really using, so with Auto KProfiles enabled
+and the screen off it reads `1` (Battery) even when `kp_mode` is `3`.
+`kp_screen` is only created when the kernel is built with
+`CONFIG_AUTO_KPROFILES`.
+
 ## Credits
 
 - [dakkshesh07/Kprofiles](https://github.com/dakkshesh07/Kprofiles) for the

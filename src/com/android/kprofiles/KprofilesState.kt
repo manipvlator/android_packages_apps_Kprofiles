@@ -10,7 +10,6 @@
 package com.android.kprofiles
 
 import android.content.Context
-import androidx.core.content.edit
 
 /**
  * Persistent KProfiles state. Device-protected storage keeps the master switch,
@@ -37,13 +36,13 @@ object KprofilesState {
         prefs(context).getBoolean(KEY_ENABLED, DEFAULT_ENABLED)
 
     fun setEnabled(context: Context, enabled: Boolean) =
-        prefs(context).edit { putBoolean(KEY_ENABLED, enabled) }
+        prefs(context).edit().putBoolean(KEY_ENABLED, enabled).apply()
 
     fun isAutoEnabled(context: Context): Boolean =
         prefs(context).getBoolean(KEY_AUTO, false)
 
     fun setAuto(context: Context, enabled: Boolean) =
-        prefs(context).edit { putBoolean(KEY_AUTO, enabled) }
+        prefs(context).edit().putBoolean(KEY_AUTO, enabled).apply()
 
     fun getMode(context: Context): String =
         Kprofiles.sanitizeModeValue(
@@ -51,5 +50,7 @@ object KprofilesState {
         )
 
     fun setMode(context: Context, mode: String) =
-        prefs(context).edit { putString(KEY_MODE, Kprofiles.sanitizeModeValue(mode)) }
+        prefs(context).edit()
+            .putString(KEY_MODE, Kprofiles.sanitizeModeValue(mode))
+            .apply()
 }
