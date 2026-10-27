@@ -23,10 +23,14 @@ object KprofilesState {
     const val KEY_MODE = "kprofiles_modes"
 
     /*
-     * Keep the initial boot inert. The user enables KProfiles explicitly; the
-     * default mode is 0 and automatic mode is off.
+     * Ship enabled with Auto KProfiles and Balanced mode so the app matches
+     * the kernel default (auto on, Balanced). The user can still turn the
+     * master switch off, which writes Disabled mode and auto off.
      */
-    const val DEFAULT_ENABLED = false
+    const val DEFAULT_ENABLED = true
+
+    private const val DEFAULT_AUTO = true
+    private const val DEFAULT_MODE = "2"
 
     private fun prefs(context: Context) =
         context.createDeviceProtectedStorageContext()
@@ -39,14 +43,14 @@ object KprofilesState {
         prefs(context).edit().putBoolean(KEY_ENABLED, enabled).apply()
 
     fun isAutoEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_AUTO, false)
+        prefs(context).getBoolean(KEY_AUTO, DEFAULT_AUTO)
 
     fun setAuto(context: Context, enabled: Boolean) =
         prefs(context).edit().putBoolean(KEY_AUTO, enabled).apply()
 
     fun getMode(context: Context): String =
         Kprofiles.sanitizeModeValue(
-            prefs(context).getString(KEY_MODE, Kprofiles.Mode.NONE.value)
+            prefs(context).getString(KEY_MODE, DEFAULT_MODE)
         )
 
     fun setMode(context: Context, mode: String) =

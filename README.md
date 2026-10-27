@@ -46,13 +46,18 @@ Enable the backend in the kernel defconfig:
 
 ```text
 CONFIG_KPROFILES=y
+CONFIG_KP_DEFAULT_MODE=2
 CONFIG_AUTO_KPROFILES=y
 CONFIG_AUTO_KPROFILES_MSM_DRM=y
 ```
 
-`auto_kp` is intentionally off until userspace enables it. The app writes it
-on only when Auto KProfiles is enabled and Battery Saver is inactive;
-otherwise it writes off.
+`auto_kp` defaults to on when Auto KProfiles support is built (`auto_kp` is
+off only with `CONFIG_AUTO_KPROFILES_NONE`), and the defconfig sets Balanced
+as the default mode. A device therefore runs Auto KProfiles + Balanced even
+before userspace writes the nodes, which is what a ROM without this frontend
+gets. The app keeps the same defaults and writes them at boot; it writes
+`auto_kp` off only when the master switch or Auto KProfiles is disabled, or
+while Battery Saver is active.
 
 ## Build integration
 
@@ -92,14 +97,16 @@ The app also needs the KProfiles sysfs nodes to be writable by
 
 1. Build the app into the ROM and flash the ROM.
 2. Open **Settings → Battery → KProfiles**, or use the Quick Settings tile.
-3. Turn on **Use KProfiles**, then choose a mode.
-4. Enable **Auto KProfiles** if you want automatic Battery mode while the
-   screen is off.
+3. KProfiles ships enabled with **Balanced** mode and **Auto KProfiles** on;
+   change the mode or turn either switch off as needed.
+4. With Auto KProfiles on, the kernel uses Battery mode while the screen is
+   off and restores the selected mode when it turns on.
 5. Android Battery Saver temporarily overrides the selected mode with Battery
    mode and disables automatic switching.
 
-KProfiles is disabled by default. The default mode is `0` (Disabled) and
-automatic mode is off. Turn on **Use KProfiles** once, then choose a mode.
+This matches the kernel default (`CONFIG_KP_DEFAULT_MODE=2`, `auto_kp=Y`), so a
+ROM built without the app behaves the same way. Choose **Disabled** mode or
+turn off **Use KProfiles** to get the stock always-boost behavior back.
 
 ## Kernel-only control
 
