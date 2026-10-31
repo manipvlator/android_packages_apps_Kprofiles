@@ -20,6 +20,7 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.android.kprofiles.R
 import com.android.kprofiles.Kprofiles
 import com.android.kprofiles.KprofilesState
 import com.android.kprofiles.utils.FileUtils
